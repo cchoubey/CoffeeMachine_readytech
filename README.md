@@ -1,6 +1,7 @@
 Solution is designed as N-tier layer architechture :-
 
-![image](https://github.com/user-attachments/assets/63e19ce0-c65f-4131-af59-2b8f2a30d2c2)
+![image](https://github.com/user-attachments/assets/6fdab6cc-9854-487c-87e3-18bc930b2e5a)
+
 
 
 Coffee machine stock is stored in a sql server database with extra info such as refilldate. On first deploy, table `CoffeeStocks` will be seeded with quantity 4 as full stock.
