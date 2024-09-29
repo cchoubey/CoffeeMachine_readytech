@@ -3,6 +3,7 @@ using CoffeeMachine.AppLogic.CustomExceptions;
 using CoffeeMachine.DataAccess.Entites;
 using CoffeeMachine.DataAccess.Repositories;
 using CoffeeMachine.ExternalServices;
+using CoffeeMachine.Helpers;
 using CoffeeMachine_Test.Repositories;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -80,7 +81,7 @@ namespace CoffeeMachine_Test.AppLogic
             var dto = DateTimeOffset.Parse(result.prepared);
 
             // assert
-            result.message.ShouldBe("Your piping hot coffee is ready");
+            result.message.ShouldBe(Consts.HotCoffee);
             dto.Offset.ShouldBe(new TimeSpan(5, 30, 0));
         }
 
@@ -122,7 +123,7 @@ namespace CoffeeMachine_Test.AppLogic
             var result = await coffeeStockLogic.GetCoffeeAsync();
 
             // assert
-            result.message.ShouldBe("Your piping hot coffee is ready");
+            result.message.ShouldBe(Consts.HotCoffee);
             result.prepared.ShouldBe(dto.ToString("yyyy-MM-ddTHH:mm:sszzz"));
         }
 
@@ -143,7 +144,7 @@ namespace CoffeeMachine_Test.AppLogic
             var result = await coffeeStockLogic.GetCoffeeAsync();
 
             // assert
-            result.message.ShouldBe("Your piping hot coffee is ready");
+            result.message.ShouldBe(Consts.HotCoffee);
             result.prepared.ShouldBe(dto.ToString("yyyy-MM-ddTHH:mm:sszzz"));
 
             // act
@@ -198,7 +199,7 @@ namespace CoffeeMachine_Test.AppLogic
             var result = await coffeeStockLogic.GetCoffeeAsyncV2();
 
             // assert
-            result.message.ShouldBe("Your refreshing iced coffee is ready");
+            result.message.ShouldBe(Consts.ColdCoffee);
             result.prepared.ShouldBe(dto.ToString("yyyy-MM-ddTHH:mm:sszzz"));
         }
     }

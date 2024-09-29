@@ -1,4 +1,5 @@
 using CoffeeMachine.AppLogic;
+using CoffeeMachine.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -23,7 +24,7 @@ namespace CoffeeMachine_IntegrationTest
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadFromJsonAsync<CoffeeDto>();
-            result.message.Should().Be("Your piping hot coffee is ready");
+            result.message.Should().Be(Consts.HotCoffee);
         }
 
         [Fact]
@@ -46,7 +47,7 @@ namespace CoffeeMachine_IntegrationTest
                 {
                     response.EnsureSuccessStatusCode();
                     var result = await response.Content.ReadFromJsonAsync<CoffeeDto>();
-                    result.message.Should().Be("Your piping hot coffee is ready");
+                    result.message.Should().Be(Consts.HotCoffee);
 
                 }
                 else

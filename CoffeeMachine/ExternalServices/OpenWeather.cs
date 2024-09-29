@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using CoffeeMachine.Helpers;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 
 namespace CoffeeMachine.ExternalServices
@@ -8,7 +9,7 @@ namespace CoffeeMachine.ExternalServices
         private readonly IConfiguration _configuration;
         private readonly ILogger<OpenWeather> _logger;
         private readonly IMemoryCache _memoryCache;
-        private const string TemperatureCacheKey = "CurrentTemperature";
+
         public OpenWeather(ILogger<OpenWeather> logger, IConfiguration configuration,
             IMemoryCache memoryCache)
         {
@@ -19,7 +20,7 @@ namespace CoffeeMachine.ExternalServices
 
         public async Task<decimal> GetCityTemperatuerFromCache()
         {
-            if (_memoryCache.TryGetValue(TemperatureCacheKey, out OpenWeatherDto openWeatherDto))
+            if (_memoryCache.TryGetValue(Consts.TemperatureCacheKey, out OpenWeatherDto openWeatherDto))
             {
                 _logger.LogInformation("reading from cache");
             }
@@ -34,7 +35,7 @@ namespace CoffeeMachine.ExternalServices
                         .SetAbsoluteExpiration(TimeSpan.FromHours(expiryHours))
                         .SetPriority(CacheItemPriority.Normal);
 
-                    _memoryCache.Set(TemperatureCacheKey, openWeatherDto, memoryCacheEntryOptions);
+                    _memoryCache.Set(Consts.TemperatureCacheKey, openWeatherDto, memoryCacheEntryOptions);
                 }
             }
 
