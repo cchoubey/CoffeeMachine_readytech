@@ -1,0 +1,6 @@
+@CoffeeMachine_HostAddress = http://localhost:5194
+
+GET {{CoffeeMachine_HostAddress}}/brew-coffee/
+Accept: application/json
+
+###
