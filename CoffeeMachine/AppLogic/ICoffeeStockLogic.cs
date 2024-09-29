@@ -6,5 +6,6 @@ namespace CoffeeMachine.AppLogic
     {
         Task<CoffeeDto> GetCoffeeAsync();
         Task RefillStock();
+        Task<CoffeeDto> GetCoffeeAsyncV2();
     }
 }

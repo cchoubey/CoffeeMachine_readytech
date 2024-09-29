@@ -1,6 +1,7 @@
 ﻿using CoffeeMachine.AppLogic;
 using CoffeeMachine.DataAccess;
 using CoffeeMachine.DataAccess.Repositories;
+using CoffeeMachine.ExternalServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace CoffeeMachine
@@ -18,7 +19,9 @@ namespace CoffeeMachine
             IConfiguration configuration)
         {
             var connString = configuration.GetConnectionString("ConString");
-            services.AddSqlServer<AppDbContext>(connString)
+            services.AddMemoryCache()
+                .AddScoped<IOpenWeather, OpenWeather>()
+                .AddSqlServer<AppDbContext>(connString)
                 .AddScoped<ITimeProviderByTimeZone, TimeProviderByTimeZone>()
                 .AddScoped<ICoffeeStockRepository, CoffeeStockRepository>()
                 .AddScoped<ICoffeeStockLogic, CoffeeStockLogic>();

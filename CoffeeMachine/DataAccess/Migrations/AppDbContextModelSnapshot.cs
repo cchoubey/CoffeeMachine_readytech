@@ -44,7 +44,7 @@ namespace CoffeeMachine.DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            Quantity = 5,
+                            Quantity = 4,
                             RefillDate = new DateTimeOffset(new DateTime(2024, 9, 28, 10, 25, 49, 761, DateTimeKind.Unspecified).AddTicks(157), new TimeSpan(0, 12, 0, 0, 0))
                         });
                 });

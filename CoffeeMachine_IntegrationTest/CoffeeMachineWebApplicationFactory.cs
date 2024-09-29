@@ -27,7 +27,12 @@ namespace CoffeeMachine_IntegrationTest
                 services.AddSqlServer<AppDbContext>(connString);
 
                 var dbContext = CreateDbContext(services);
-                dbContext.Database.EnsureDeleted();
+                try
+                {
+                    dbContext.Database.EnsureDeleted();
+                }
+                catch {}
+                
             });
         }
 

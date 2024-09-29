@@ -58,5 +58,23 @@ namespace CoffeeMachine_IntegrationTest
                 }
             }
         }
+
+        [Fact]
+        public async Task ShouldAccessV2Method()
+        {
+            //Arrange
+            var app = new CoffeeMachineWebApplicationFactory();
+
+            var client = app.CreateClient();
+            client.DefaultRequestHeaders.Add("X-Api-Version", "2.0");
+            //Act
+            var response = await client.GetAsync("brew-coffee");
+
+            //Assert
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<CoffeeDto>();
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        }
     }
 }

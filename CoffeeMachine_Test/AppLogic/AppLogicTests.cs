@@ -8,11 +8,11 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Shouldly;
 
-namespace CoffeeMachine_Test.AppLogic
+namespace CoffeeMachine_Test
 {
     public class AppLogicTests
     {
-
+        
         [Fact]
         public void ConstructorThrowsArgumentNullException_When_CoffeeRepoNull()
         {
@@ -94,7 +94,7 @@ namespace CoffeeMachine_Test.AppLogic
             var coffeeStockRepository = new Mock<ICoffeeStockRepository>();
             var openWeather = new Mock<IOpenWeather>();
             // act
-            var action = () => new CoffeeStockLogic(coffeeStockRepository.Object,
+            var action = () => new CoffeeStockLogic(coffeeStockRepository.Object, 
                 timeProvider.Object, openWeather.Object).GetCoffeeAsync();
 
             // assert
@@ -115,7 +115,7 @@ namespace CoffeeMachine_Test.AppLogic
 
             coffeeStockRepository.Setup(l => l.GetCoffeeStockAsync()).Returns(Task.FromResult<CoffeeStock>(coffeeStock));
 
-            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object,
+            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object, 
                 timeProvider.Object, openWeather.Object);
 
             // act
@@ -136,7 +136,7 @@ namespace CoffeeMachine_Test.AppLogic
             var openWeather = new Mock<IOpenWeather>();
             var coffeeStockRepository = new CoffeeStockRepositoryTest();
 
-            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.IcoffeeStockRepository,
+            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.IcoffeeStockRepository, 
                 timeProvider.Object, openWeather.Object);
 
             // act
@@ -166,7 +166,7 @@ namespace CoffeeMachine_Test.AppLogic
 
             coffeeStockRepository.Setup(l => l.GetCoffeeStockAsync()).Returns(Task.FromResult<CoffeeStock>(coffeeStock));
 
-            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object,
+            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object, 
                 timeProvider.Object, openWeather.Object);
 
             // act
