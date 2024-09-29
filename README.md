@@ -1,6 +1,6 @@
 Solution is designed as N-tier layer architechture :-
 
-![image](https://github.com/user-attachments/assets/6fdab6cc-9854-487c-87e3-18bc930b2e5a)
+![Screenshot 2024-09-30 083025](https://github.com/user-attachments/assets/2cc711c4-922a-4ba7-b927-70a5adcf9f2b)
 
 
 
