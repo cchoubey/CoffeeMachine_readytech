@@ -2,6 +2,7 @@
 using CoffeeMachine.AppLogic.CustomExceptions;
 using CoffeeMachine.DataAccess.Entites;
 using CoffeeMachine.DataAccess.Repositories;
+using CoffeeMachine.Helpers;
 using System;
 
 namespace CoffeeMachine.AppLogic
@@ -22,7 +23,7 @@ namespace CoffeeMachine.AppLogic
             var Now = _timeProvider.GetDateTimeOffsetNow();
             if (Now.Date.Month == 4 && Now.Date.Day == 1)
             {
-                throw new TeaPotException("I’m a teapot");
+                throw new TeaPotException(Consts.TeaPotExceptionMessage);
             }
 
             var result = await GetCoffeeStockAsync();
@@ -32,9 +33,9 @@ namespace CoffeeMachine.AppLogic
                 result.Quantity = result.Quantity - 1;
                 UpdateStock(result);
 
-                return new CoffeeDto("Your piping hot coffee is ready", Now.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+                return new CoffeeDto(Consts.HotCoffee, Now.ToString("yyyy-MM-ddTHH:mm:sszzz"));
             }
-            throw new ServiceUnavailableException("no coffee");
+            throw new ServiceUnavailableException(Consts.ServiceUnavailableMessage);
         }
 
         public async Task RefillStock()
