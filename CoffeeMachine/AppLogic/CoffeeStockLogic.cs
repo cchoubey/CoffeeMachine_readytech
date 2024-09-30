@@ -2,6 +2,7 @@
 using CoffeeMachine.AppLogic.CustomExceptions;
 using CoffeeMachine.DataAccess.Entites;
 using CoffeeMachine.DataAccess.Repositories;
+using CoffeeMachine.ExternalServices;
 using CoffeeMachine.Helpers;
 using System;
 
@@ -11,11 +12,14 @@ namespace CoffeeMachine.AppLogic
     {
         private readonly ICoffeeStockRepository _coffeeStockRepository;
         private readonly ITimeProviderByTimeZone _timeProvider;
+        private readonly IOpenWeather _openWeather;
 
-        public CoffeeStockLogic(ICoffeeStockRepository coffeeStockRepository, ITimeProviderByTimeZone timeProvider)
+        public CoffeeStockLogic(ICoffeeStockRepository coffeeStockRepository, 
+            ITimeProviderByTimeZone timeProvider, IOpenWeather openWeather)
         {
             _coffeeStockRepository = coffeeStockRepository ?? throw new ArgumentNullException(nameof(coffeeStockRepository));
             _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+            _openWeather = openWeather ?? throw new ArgumentNullException(nameof(openWeather));
         }
 
         public async Task<CoffeeDto> GetCoffeeAsync()
@@ -38,6 +42,18 @@ namespace CoffeeMachine.AppLogic
             throw new ServiceUnavailableException(Consts.ServiceUnavailableMessage);
         }
 
+        public async Task<CoffeeDto> GetCoffeeAsyncV2()
+        {
+            var coffee = await GetCoffeeAsync();
+            var todayTemperature = await _openWeather.GetCityTemperatuerFromCache();
+
+            if (todayTemperature > 30)
+            {
+                return new CoffeeDto(Consts.ColdCoffee, coffee.prepared);
+            }
+
+            return coffee;
+        }
         public async Task RefillStock()
         {
             var coffeeStock = await GetCoffeeStockAsync();

@@ -1,8 +1,11 @@
-﻿using CoffeeMachine.AppLogic;
+﻿using Asp.Versioning;
+using CoffeeMachine.AppLogic;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoffeeMachine.Controllers
 {
+    [ApiVersion(1)]
+    [ApiVersion(2)]
     [ApiController]
     [Route("brew-coffee")]
     public class BrewCoffeeController : ControllerBase
@@ -15,10 +18,20 @@ namespace CoffeeMachine.Controllers
             _coffeeStockLogic = coffeeStockLogic;
         }
 
+        [MapToApiVersion(1)]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
             var coffee = await _coffeeStockLogic.GetCoffeeAsync().ConfigureAwait(false);
+            return Ok(coffee);
+        }
+
+        [MapToApiVersion(2)]
+        [HttpGet]
+        public async Task<IActionResult> GetWithCityInfo()
+        {
+            _logger.LogInformation("v2 called");
+            var coffee = await _coffeeStockLogic.GetCoffeeAsyncV2().ConfigureAwait(false);
             return Ok(coffee);
         }
 

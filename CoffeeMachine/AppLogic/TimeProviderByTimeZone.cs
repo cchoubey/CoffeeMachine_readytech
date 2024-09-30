@@ -10,7 +10,7 @@ namespace CoffeeMachine.AppLogic
         }
         public DateTimeOffset GetDateTimeOffsetNow()
         {
-            var tzi = TimeZoneInfo.FindSystemTimeZoneById(_config.GetValue<string>("TimeZoneId"));
+            var tzi = TimeZoneInfo.FindSystemTimeZoneById(_config.GetValue<string>("City:TimeZoneId"));
             var dto = DateTimeOffset.Now;
 
             return dto.ToOffset(tzi.GetUtcOffset(dto));

@@ -1,8 +1,7 @@
 Setup :-
 ```
-In appsettings.json, please make sure connection string is connecting to a sql server wherever you have got sql server running.
+In appsettings.json, please make sure connection string is connecting to a sql server wherever you have got sql server running.Solution is designed as N-tier layer architechture :-
 ```
-Solution is designed as N-tier layer architechture :-
 
 ![Screenshot 2024-09-30 083025](https://github.com/user-attachments/assets/2cc711c4-922a-4ba7-b927-70a5adcf9f2b)
 

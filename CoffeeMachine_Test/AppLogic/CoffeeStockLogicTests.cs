@@ -2,6 +2,7 @@
 using CoffeeMachine.AppLogic.CustomExceptions;
 using CoffeeMachine.DataAccess.Entites;
 using CoffeeMachine.DataAccess.Repositories;
+using CoffeeMachine.ExternalServices;
 using CoffeeMachine.Helpers;
 using CoffeeMachine_Test.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +11,7 @@ using Shouldly;
 
 namespace CoffeeMachine_Test.AppLogic
 {
-    public class CoffeeStockLogicTests
+    public class AppLogicTests
     {
 
         [Fact]
@@ -18,8 +19,9 @@ namespace CoffeeMachine_Test.AppLogic
         {
             //arrange
             var timeProvider = new Mock<ITimeProviderByTimeZone>();
+            var openWeather = new Mock<IOpenWeather>();
             // act
-            var action = () => new CoffeeStockLogic(null, timeProvider.Object);
+            var action = () => new CoffeeStockLogic(null, timeProvider.Object, openWeather.Object);
 
             // assert
             action.ShouldThrow<ArgumentNullException>();
@@ -30,27 +32,26 @@ namespace CoffeeMachine_Test.AppLogic
         {
             //arrange
             var coffeeRepo = new Mock<ICoffeeStockRepository>();
+            var openWeather = new Mock<IOpenWeather>();
             // act
-            var action = () => new CoffeeStockLogic(coffeeRepo.Object, null);
+            var action = () => new CoffeeStockLogic(coffeeRepo.Object, null, openWeather.Object);
 
             // assert
             action.ShouldThrow<ArgumentNullException>();
         }
 
         [Fact]
-        public void ShouldThrowTeaPotException_on_FirstApril()
+        public void ConstructorThrowsArgumentNullException_When_OpenWeatherNull()
         {
             //arrange
-            var dto = new DateTimeOffset(2024, 4, 1, 0, 0, 0, new TimeSpan());
+            var coffeeRepo = new Mock<ICoffeeStockRepository>();
             var timeProvider = new Mock<ITimeProviderByTimeZone>();
-            timeProvider.Setup(l => l.GetDateTimeOffsetNow()).Returns(dto);
-            var coffeeStockRepository = new Mock<ICoffeeStockRepository>();
 
             // act
-            var action = () => new CoffeeStockLogic(coffeeStockRepository.Object, timeProvider.Object).GetCoffeeAsync();
+            var action = () => new CoffeeStockLogic(coffeeRepo.Object, timeProvider.Object, null);
 
             // assert
-            action.ShouldThrow<TeaPotException>();
+            action.ShouldThrow<ArgumentNullException>();
         }
 
         [Fact]
@@ -58,7 +59,7 @@ namespace CoffeeMachine_Test.AppLogic
         {
             // arrange
             var inMemorySettings = new Dictionary<string, string> {
-                {"TimeZoneId", "India Standard Time"}};
+                {"City:TimeZoneId", "India Standard Time"}};
 
             IConfiguration configuration = new ConfigurationBuilder()
                             .AddInMemoryCollection(inMemorySettings)
@@ -69,10 +70,10 @@ namespace CoffeeMachine_Test.AppLogic
             var coffeeStock = new CoffeeStock { Id = 1, Quantity = 4 };
 
             var coffeeStockRepository = new Mock<ICoffeeStockRepository>();
-
             coffeeStockRepository.Setup(l => l.GetCoffeeStockAsync()).Returns(Task.FromResult(coffeeStock));
 
-            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object, timeProvider);
+            var openWeather = new Mock<IOpenWeather>();
+            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object, timeProvider, openWeather.Object);
 
             // act
             var result = await coffeeStockLogic.GetCoffeeAsync();
@@ -81,7 +82,24 @@ namespace CoffeeMachine_Test.AppLogic
 
             // assert
             result.message.ShouldBe(Consts.HotCoffee);
-            dto.Offset.ShouldBe(new TimeSpan(5,30,0));
+            dto.Offset.ShouldBe(new TimeSpan(5, 30, 0));
+        }
+
+        [Fact]
+        public void ShouldThrowTeaPotException_on_FirstApril()
+        {
+            //arrange
+            var dto = new DateTimeOffset(2024, 4, 1, 0, 0, 0, new TimeSpan());
+            var timeProvider = new Mock<ITimeProviderByTimeZone>();
+            timeProvider.Setup(l => l.GetDateTimeOffsetNow()).Returns(dto);
+            var coffeeStockRepository = new Mock<ICoffeeStockRepository>();
+            var openWeather = new Mock<IOpenWeather>();
+            // act
+            var action = () => new CoffeeStockLogic(coffeeStockRepository.Object,
+                timeProvider.Object, openWeather.Object).GetCoffeeAsync();
+
+            // assert
+            action.ShouldThrow<TeaPotException>();
         }
 
         [Fact]
@@ -91,14 +109,15 @@ namespace CoffeeMachine_Test.AppLogic
             var dto = DateTimeOffset.Now;
             var timeProvider = new Mock<ITimeProviderByTimeZone>();
             timeProvider.Setup(l => l.GetDateTimeOffsetNow()).Returns(dto);
-
+            var openWeather = new Mock<IOpenWeather>();
             var coffeeStock = new CoffeeStock { Id = 1, Quantity = 4 };
 
             var coffeeStockRepository = new Mock<ICoffeeStockRepository>();
 
-            coffeeStockRepository.Setup(l => l.GetCoffeeStockAsync()).Returns(Task.FromResult(coffeeStock));
+            coffeeStockRepository.Setup(l => l.GetCoffeeStockAsync()).Returns(Task.FromResult<CoffeeStock>(coffeeStock));
 
-            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object, timeProvider.Object);
+            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object,
+                timeProvider.Object, openWeather.Object);
 
             // act
             var result = await coffeeStockLogic.GetCoffeeAsync();
@@ -115,10 +134,11 @@ namespace CoffeeMachine_Test.AppLogic
             var dto = DateTimeOffset.Now;
             var timeProvider = new Mock<ITimeProviderByTimeZone>();
             timeProvider.Setup(l => l.GetDateTimeOffsetNow()).Returns(dto);
-
+            var openWeather = new Mock<IOpenWeather>();
             var coffeeStockRepository = new CoffeeStockRepositoryTest();
 
-            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.IcoffeeStockRepository, timeProvider.Object);
+            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.IcoffeeStockRepository,
+                timeProvider.Object, openWeather.Object);
 
             // act
             var result = await coffeeStockLogic.GetCoffeeAsync();
@@ -140,20 +160,47 @@ namespace CoffeeMachine_Test.AppLogic
             var dto = DateTimeOffset.Now;
             var timeProvider = new Mock<ITimeProviderByTimeZone>();
             timeProvider.Setup(l => l.GetDateTimeOffsetNow()).Returns(dto);
-
+            var openWeather = new Mock<IOpenWeather>();
             var coffeeStock = new CoffeeStock { Id = 1, Quantity = 0 };
 
             var coffeeStockRepository = new Mock<ICoffeeStockRepository>();
 
-            coffeeStockRepository.Setup(l => l.GetCoffeeStockAsync()).Returns(Task.FromResult(coffeeStock));
+            coffeeStockRepository.Setup(l => l.GetCoffeeStockAsync()).Returns(Task.FromResult<CoffeeStock>(coffeeStock));
 
-            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object, timeProvider.Object);
+            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object,
+                timeProvider.Object, openWeather.Object);
 
             // act
             var action = coffeeStockLogic.GetCoffeeAsync();
 
             // assert
             action.ShouldThrow<ServiceUnavailableException>();
+        }
+
+        [Fact]
+        public async void ShouldReturnColdCoffee_when_weatherisHot()
+        {
+            // arrange
+            var dto = DateTimeOffset.Now;
+            var timeProvider = new Mock<ITimeProviderByTimeZone>();
+            timeProvider.Setup(l => l.GetDateTimeOffsetNow()).Returns(dto);
+            var openWeather = new Mock<IOpenWeather>();
+            openWeather.Setup(o => o.GetCityTemperatuerFromCache()).Returns(Task.FromResult<decimal>(45));
+            var coffeeStock = new CoffeeStock { Id = 1, Quantity = 4 };
+
+            var coffeeStockRepository = new Mock<ICoffeeStockRepository>();
+
+            coffeeStockRepository.Setup(l => l.GetCoffeeStockAsync()).Returns(Task.FromResult<CoffeeStock>(coffeeStock));
+
+            var coffeeStockLogic = new CoffeeStockLogic(coffeeStockRepository.Object,
+                timeProvider.Object, openWeather.Object);
+
+            // act
+            var result = await coffeeStockLogic.GetCoffeeAsyncV2();
+
+            // assert
+            result.message.ShouldBe(Consts.ColdCoffee);
+            result.prepared.ShouldBe(dto.ToString("yyyy-MM-ddTHH:mm:sszzz"));
         }
     }
 }
