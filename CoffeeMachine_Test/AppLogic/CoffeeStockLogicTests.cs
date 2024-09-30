@@ -100,6 +100,8 @@ namespace CoffeeMachine_Test.AppLogic
 
             // assert
             action.ShouldThrow<TeaPotException>();
+
+            dto.Offset.ShouldBe(new TimeSpan(5,30,0));
         }
 
         [Fact]
